@@ -179,11 +179,28 @@ public class BeanBinderTest
 
     @Test(expected = ClassCastException.class)
     public void fieldWithInvalidConverterBound_bindBean_fieldValueUpdated() {
-        binder.forField(ageField).withConverter(Float::valueOf, String::valueOf)
+    	binder.forField(ageField).withConverter(Float::valueOf, String::valueOf)
                 .bind("age");
+    	
         binder.setBean(item);
+        
+        try {
+        	ageField.setValue("12"); //<-- triggers ClassCastException which is masked by RuntimeException and MethodInvocationException
+        }
+        catch(RuntimeException e) {
+        	Throwable deepException = e;
+        	while(deepException != null) {
+        		if (deepException instanceof ClassCastException) {
+        			throw (ClassCastException)deepException;
+        		}
+        		else {
+        			deepException = deepException.getCause();
+        		}
+        	}
+        	
+        	throw e;
+        }
 
-        assertEquals("32", ageField.getValue());
     }
 
     @Test

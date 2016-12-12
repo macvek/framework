@@ -15,8 +15,11 @@
  */
 package com.vaadin.data;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -40,6 +43,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 
 /**
  * Book of Vaadin tests.
@@ -263,11 +267,14 @@ public class BinderBookOfVaadinTest {
         salaryBinding2.bind(BookPerson::getSalaryLevel,
                 BookPerson::setSalaryLevel);
 
+        
         // Test that the book code works
         BookPerson bookPerson = new BookPerson(1972, 4);
         binder.setBean(bookPerson);
         Assert.assertEquals(4.0, salaryLevelField.getValue().doubleValue(), 0);
-        Assert.assertEquals("1,972", yearOfBirthField.getValue());
+        
+        
+        Assert.assertEquals(stringFromModelUsingDefaultLocale(1972), yearOfBirthField.getValue());
 
         bookPerson.setSalaryLevel(8);
         binder.readBean(bookPerson);
@@ -823,5 +830,9 @@ public class BinderBookOfVaadinTest {
     private void verifyEventIsFired(AtomicBoolean flag) {
         Assert.assertTrue(flag.get());
         flag.set(false);
+    }
+    
+    private String stringFromModelUsingDefaultLocale(Integer input) {
+    	return NumberFormat.getNumberInstance(Locale.getDefault()).format(input);
     }
 }
